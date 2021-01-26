@@ -24,13 +24,15 @@ contract Campaign {
         mapping(address => bool) approvals;
     }
 
-    Request[] public requests;
+    // TODO: Convert this to dynamic array.
+    Request[5] public requests;
     address public manager;
     uint256 public minContri;
 
     // Keys are not stored in mapping, hence cannot be iterated upon, this is a hash data structure.
     mapping(address => bool) public approvers;
     uint256 public approversCount;
+    uint256 public numRequests;
 
     modifier restricted() {
         require(msg.sender == manager);
@@ -40,6 +42,7 @@ contract Campaign {
     constructor(uint256 min, address creator) {
         manager = creator;
         minContri = min;
+        numRequests = 0;
     }
 
     function contribute() public payable {
@@ -53,8 +56,10 @@ contract Campaign {
         uint256 value,
         address recp
     ) public restricted {
-        Request storage newRequest;
 
+        Request storage newRequest;
+        newRequest = requests[numRequests];
+        numRequests++;
         newRequest.desc = desc;
         newRequest.val = value;
         newRequest.rec = payable(recp);
